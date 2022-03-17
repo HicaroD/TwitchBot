@@ -28,12 +28,21 @@ func (irc *IRC) send_command(command, body string) error {
 	if command == "" || body == "" {
 		return fmt.Errorf("Command or body shouldn't be empty")
 	}
-	fmt.Fprintf(irc.client, "%s %s\n", command, body)
-	return nil
+	_, err := fmt.Fprintf(irc.client, "%s %s\n", command, body)
+	return err
 }
 
-func (irc *IRC) send_pong_to_server() {
-	irc.send_command("PONG", ":tmi.twitch.tv")
+func (irc *IRC) send_message(channel_name, message string) error {
+	if message == "" || channel_name == "" {
+		return fmt.Errorf("Message or channel name should not be empty")
+	}
+	err := irc.send_command("PRIVMSG " + channel_name, ":" + message)
+	return err
+}
+
+func (irc *IRC) send_pong_to_server() error {
+	err := irc.send_command("PONG", ":tmi.twitch.tv")
+	return err
 }
 
 const BUFFER_SIZE = 2040
@@ -49,9 +58,8 @@ func main() {
 	var (
 		OAUTH_TOKEN  = os.Getenv("OAUTH_TOKEN")
 		BOT_NAME     = os.Getenv("BOT_NAME")
-		CHANNEL_NAME = os.Getenv("CHANNEL_NAME")
+		CHANNEL_NAME = "#" + os.Getenv("CHANNEL_NAME")
 	)
-	fmt.Println(OAUTH_TOKEN, BOT_NAME, CHANNEL_NAME)
 
 	irc, err := new_irc()
 	if err != nil {
@@ -79,7 +87,15 @@ func main() {
 			if received_data_size > 0 {
 				fmt.Println(message)
 				if strings.HasPrefix(message, "PING") {
-					irc.send_pong_to_server()
+					err := irc.send_pong_to_server()
+					if err != nil {
+						log.Fatal("Unable to send PONG")
+					}
+				} else if strings.HasPrefix(message, ":") {
+					err := irc.send_message(CHANNEL_NAME, "Testing my bot")
+					if err != nil {
+						log.Fatal("Unable to send message")
+					}
 				}
 			}
 		}
