@@ -49,29 +49,37 @@ func main(){
     )
     fmt.Println(OAUTH_TOKEN, BOT_NAME, CHANNEL_NAME)
 
-    connection, err := net.Dial("tcp", "irc.chat.twitch.tv:6667")
-
-    defer connection.Close()
-
+    irc, err := new_irc()
     if err != nil {
         log.Fatal("Unable to establish connection to IRC server")
     }
 
-    fmt.Fprintf(connection, "PASS %s\nNICK %s\nJOIN %s\n", OAUTH_TOKEN, BOT_NAME, "#" + CHANNEL_NAME)
-    for {
-        received_data := make([]byte, BUFFER_SIZE)
-        received_data_size, err := connection.Read(received_data)
-        if err != nil {
-            log.Fatal("Unable to read data from socket")
-        }
+    wg.Add(2)
+    go func() {
+        irc.send_command("PASS", OAUTH_TOKEN)
+        irc.send_command("NICK", BOT_NAME)
+        irc.send_command("JOIN", CHANNEL_NAME)
+        wg.Done()
+    }()
 
-        message := string(received_data)
-
-        if received_data_size > 0 {
-            fmt.Println(message)
-            if strings.HasPrefix(message, "PING") {
-                fmt.Fprintf(connection, "PONG :tmi.twitch.tv")
+    go func(){
+        for {
+            received_data := make([]byte, BUFFER_SIZE)
+            received_data_size, err := irc.client.Read(received_data)
+            if err != nil {
+                log.Fatal("Unable to read data from socket")
             }
-        } 
-    }
+
+            message := string(received_data)
+
+            if received_data_size > 0 {
+                fmt.Println(message)
+                if strings.HasPrefix(message, "PING") {
+                    fmt.Fprintf(irc.client, "PONG :tmi.twitch.tv")
+                }
+            } 
+        }
+        wg.Done()
+    }()
+    wg.Wait()
 }
