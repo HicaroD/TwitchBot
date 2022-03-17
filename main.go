@@ -6,14 +6,31 @@ import (
     "os"
     "net"
     "strings"
+    "sync"
     "github.com/joho/godotenv"
 )
 
-//type IRC struct {}
-//
-//func (irc *IRC) ConnectToClient() () {
-//    connection, err := net.Dial("tcp", "irc.chat.twitch.tv:6667")
-//}
+var wg = sync.WaitGroup{}
+
+type IRC struct {
+    client net.Conn
+}
+
+func new_irc() (*IRC, error) {
+    connection, err := net.Dial("tcp", "irc.chat.twitch.tv:6667")
+    if err != nil {
+        return nil, err
+    }
+    return &IRC{connection}, nil
+}
+
+func (irc *IRC) send_command(command, body string) error {
+    if command == "" || body == "" {
+        return fmt.Errorf("Command or body shouldn't be empty")
+    }
+    fmt.Fprintf(irc.client, "%s %s\n", command, body)
+    return nil
+}
 
 const BUFFER_SIZE = 2040;
 
