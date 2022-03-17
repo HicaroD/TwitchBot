@@ -1,85 +1,89 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    "os"
-    "net"
-    "strings"
-    "sync"
-    "github.com/joho/godotenv"
+	"fmt"
+	"github.com/joho/godotenv"
+	"log"
+	"net"
+	"os"
+	"strings"
+	"sync"
 )
 
 var wg = sync.WaitGroup{}
 
 type IRC struct {
-    client net.Conn
+	client net.Conn
 }
 
 func new_irc() (*IRC, error) {
-    connection, err := net.Dial("tcp", "irc.chat.twitch.tv:6667")
-    if err != nil {
-        return nil, err
-    }
-    return &IRC{connection}, nil
+	connection, err := net.Dial("tcp", "irc.chat.twitch.tv:6667")
+	if err != nil {
+		return nil, err
+	}
+	return &IRC{connection}, nil
 }
 
 func (irc *IRC) send_command(command, body string) error {
-    if command == "" || body == "" {
-        return fmt.Errorf("Command or body shouldn't be empty")
-    }
-    fmt.Fprintf(irc.client, "%s %s\n", command, body)
-    return nil
+	if command == "" || body == "" {
+		return fmt.Errorf("Command or body shouldn't be empty")
+	}
+	fmt.Fprintf(irc.client, "%s %s\n", command, body)
+	return nil
 }
 
-const BUFFER_SIZE = 2040;
+func (irc *IRC) send_pong_to_server() {
+	irc.send_command("PONG", ":tmi.twitch.tv")
+}
 
-func main(){
-    var err error
+const BUFFER_SIZE = 2040
 
-    err = godotenv.Load()
-    if err != nil {
-        log.Fatal("Error loading the .env file")
-    }
+func main() {
+	var err error
 
-    var (
-        OAUTH_TOKEN = os.Getenv("OAUTH_TOKEN")
-        BOT_NAME = os.Getenv("BOT_NAME")
-        CHANNEL_NAME = os.Getenv("CHANNEL_NAME")
-    )
-    fmt.Println(OAUTH_TOKEN, BOT_NAME, CHANNEL_NAME)
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading the .env file")
+	}
 
-    irc, err := new_irc()
-    if err != nil {
-        log.Fatal("Unable to establish connection to IRC server")
-    }
+	var (
+		OAUTH_TOKEN  = os.Getenv("OAUTH_TOKEN")
+		BOT_NAME     = os.Getenv("BOT_NAME")
+		CHANNEL_NAME = os.Getenv("CHANNEL_NAME")
+	)
+	fmt.Println(OAUTH_TOKEN, BOT_NAME, CHANNEL_NAME)
 
-    wg.Add(2)
-    go func() {
-        irc.send_command("PASS", OAUTH_TOKEN)
-        irc.send_command("NICK", BOT_NAME)
-        irc.send_command("JOIN", CHANNEL_NAME)
-        wg.Done()
-    }()
+	irc, err := new_irc()
+	if err != nil {
+		log.Fatal("Unable to establish connection to IRC server")
+	}
 
-    go func(){
-        for {
-            received_data := make([]byte, BUFFER_SIZE)
-            received_data_size, err := irc.client.Read(received_data)
-            if err != nil {
-                log.Fatal("Unable to read data from socket")
-            }
+	wg.Add(2)
+	go func() {
+		irc.send_command("PASS", OAUTH_TOKEN)
+		irc.send_command("NICK", BOT_NAME)
+		irc.send_command("JOIN", CHANNEL_NAME)
+		wg.Done()
+	}()
 
-            message := string(received_data)
+	go func() {
+		for {
+			received_data := make([]byte, BUFFER_SIZE)
+			received_data_size, err := irc.client.Read(received_data)
+			if err != nil {
+				log.Fatal("Unable to read data from socket")
+			}
 
-            if received_data_size > 0 {
-                fmt.Println(message)
-                if strings.HasPrefix(message, "PING") {
-                    fmt.Fprintf(irc.client, "PONG :tmi.twitch.tv")
-                }
-            } 
-        }
-        wg.Done()
-    }()
-    wg.Wait()
+			message := string(received_data)
+
+			if received_data_size > 0 {
+				fmt.Println(message)
+				if strings.HasPrefix(message, "PING") {
+					irc.send_pong_to_server()
+				}
+			}
+		}
+		wg.Done()
+	}()
+	wg.Wait()
 }
