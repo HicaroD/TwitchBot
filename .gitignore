@@ -16,3 +16,6 @@
 
 # Personal notes
 notes.txt
+
+# Environment variables file
+.env
