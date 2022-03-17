@@ -15,6 +15,8 @@ import (
 //    connection, err := net.Dial("tcp", "irc.chat.twitch.tv:6667")
 //}
 
+const BUFFER_SIZE = 2040;
+
 func main(){
     var err error
 
@@ -40,13 +42,13 @@ func main(){
 
     fmt.Fprintf(connection, "PASS %s\nNICK %s\nJOIN %s\n", OAUTH_TOKEN, BOT_NAME, "#" + CHANNEL_NAME)
     for {
-        received_data := make([]byte, 2040)
+        received_data := make([]byte, BUFFER_SIZE)
         received_data_size, err := connection.Read(received_data)
-        message := string(received_data)
-
         if err != nil {
             log.Fatal("Unable to read data from socket")
         }
+
+        message := string(received_data)
 
         if received_data_size > 0 {
             fmt.Println(message)
