@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func test_if_gets_error_when_command_is_empty(t *testing.T) {
-    var err error
+	var err error
 	irc, _ := new_irc()
 	inputs := [][]string{{"", "some data"}, {"some data", ""}, {"", ""}}
 
