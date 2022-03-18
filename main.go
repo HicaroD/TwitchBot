@@ -26,7 +26,7 @@ func new_irc() (*IRC, error) {
 
 func (irc *IRC) send_command(command, body string) error {
 	if command == "" || body == "" {
-		return fmt.Errorf("Command or body shouldn't be empty")
+		return fmt.Errorf("command or body shouldn't be empty")
 	}
 	_, err := fmt.Fprintf(irc.client, "%s %s\n", command, body)
 	return err
@@ -34,7 +34,7 @@ func (irc *IRC) send_command(command, body string) error {
 
 func (irc *IRC) send_message(channel_name, message string) error {
 	if message == "" || channel_name == "" {
-		return fmt.Errorf("Message or channel name should not be empty")
+		return fmt.Errorf("message or channel name should not be empty")
 	}
 	err := irc.send_command("PRIVMSG "+channel_name, ":"+message)
 	return err
@@ -52,7 +52,7 @@ func main() {
 
 	err = godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading the .env file")
+		log.Fatal(err)
 	}
 
 	var (
@@ -63,7 +63,7 @@ func main() {
 
 	irc, err := new_irc()
 	if err != nil {
-		log.Fatal("Unable to establish connection to IRC server")
+		log.Fatal(err)
 	}
 
 	wg.Add(2)
@@ -79,14 +79,14 @@ func main() {
 			received_data := make([]byte, BUFFER_SIZE)
 			received_data_size, err := irc.client.Read(received_data)
 			if err != nil {
-				log.Fatal("Unable to read data from socket")
+				log.Fatal(err)
 			}
 
 			message := strings.Split(string(received_data), "\n")[0]
 
 			if received_data_size > 0 {
 				parser := new_parser(message)
-				nickname, message, err := parser.parse()
+				_, message, err := parser.parse()
 
 				if err != nil {
 					log.Fatal(err)
@@ -94,12 +94,12 @@ func main() {
 				if strings.HasPrefix(message, "PING") {
 					err := irc.send_pong_to_server()
 					if err != nil {
-						log.Fatal("Unable to send PONG")
+						log.Fatal(err)
 					}
-				} else if strings.HasPrefix(message, ":") {
+				} else if strings.HasPrefix(message, "!bot") {
 					err := irc.send_message(CHANNEL_NAME, "Testing my bot")
 					if err != nil {
-						log.Fatal("Unable to send message")
+						log.Fatal(err)
 					}
 				}
 			}
