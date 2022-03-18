@@ -17,26 +17,43 @@ func (parser *Parser) is_user_message() bool {
 	return strings.Contains(parser.raw_message, "PRIVMSG")
 }
 
-// TODO(Hícaro): Fix and refactor parser function(a lot of indentation)
-func (parser *Parser) get_message() (string, string, error) {
-	nickname, message := "", ""
-	if parser.is_user_message() {
-		exclamation_mark_index := strings.Index(parser.raw_message, "!")
-		if exclamation_mark_index != -1 {
-			nickname = parser.raw_message[1:exclamation_mark_index]
-			remainder_message := parser.raw_message[exclamation_mark_index+1:]
-			hashtag_index := strings.Index(remainder_message, "#")
-
-			if hashtag_index != -1 {
-				remainder_message = remainder_message[hashtag_index+1:]
-				colon_index := strings.Index(parser.raw_message, ":")
-				message = remainder_message[colon_index:]
-			} else {
-				return "", "", fmt.Errorf("Hashtag not found!")
-			}
-		} else {
-			return "", "", fmt.Errorf("Exclamation mark not found!")
-		}
+func (parser *Parser) get_nickname() (string, error) {
+	exclamation_mark_index := strings.Index(parser.raw_message, "!")
+	if exclamation_mark_index == -1 {
+		return "", fmt.Errorf("Exclamation mark not found!")
 	}
-	return nickname, message, nil
+	nickname := parser.raw_message[1:exclamation_mark_index]
+	return nickname, nil
+}
+
+func (parser *Parser) get_message() (string, error) {
+	hashtag_index := strings.Index(parser.raw_message, "#")
+	if hashtag_index == -1 {
+		return "", fmt.Errorf("Hashtag not found!")
+	}
+	reimainder := parser.raw_message[hashtag_index+1:]
+	colon_index := strings.Index(reimainder, ":")
+
+	if colon_index == -1 {
+		return "", fmt.Errorf("Hashtag not found!")
+	}
+	message := reimainder[colon_index+1:]
+	return message, nil
+}
+
+func (parser *Parser) parse() (string, string, error) {
+	if parser.is_user_message() {
+		nickname, err := parser.get_nickname()
+		if err != nil {
+			return "", "", err
+		}
+
+		message, err := parser.get_message()
+		if err != nil {
+			return "", "", err
+		}
+
+		return nickname, message, nil
+	}
+	return "S: ", parser.raw_message, nil
 }
