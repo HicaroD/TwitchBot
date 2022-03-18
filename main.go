@@ -86,14 +86,11 @@ func main() {
 
 			if received_data_size > 0 {
 				parser := new_parser(message)
-				nickname, message, err := parser.get_message()
+				nickname, message, err := parser.parse()
 
 				if err != nil {
 					log.Fatal(err)
 				}
-
-				fmt.Println(nickname)
-				fmt.Println(message)
 				if strings.HasPrefix(message, "PING") {
 					err := irc.send_pong_to_server()
 					if err != nil {
