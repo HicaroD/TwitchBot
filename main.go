@@ -82,21 +82,21 @@ func main() {
 				log.Fatal(err)
 			}
 
-			message := strings.Split(string(received_data), "\n")[0]
+			raw_message := strings.Split(string(received_data), "\n")[0]
 
 			if received_data_size > 0 {
-				parser := new_parser(message)
-				_, message, err := parser.parse()
+				parser := new_parser(raw_message)
+				_, parsed_message, err := parser.parse()
 
 				if err != nil {
 					log.Fatal(err)
 				}
-				if strings.HasPrefix(message, "PING") {
+				if strings.HasPrefix(raw_message, "PING") {
 					err := irc.send_pong_to_server()
 					if err != nil {
 						log.Fatal(err)
 					}
-				} else if strings.HasPrefix(message, "!bot") {
+				} else if strings.HasPrefix(parsed_message, "!bot") {
 					err := irc.send_message(CHANNEL_NAME, "Testing my bot")
 					if err != nil {
 						log.Fatal(err)
