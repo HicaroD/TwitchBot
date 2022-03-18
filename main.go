@@ -36,7 +36,7 @@ func (irc *IRC) send_message(channel_name, message string) error {
 	if message == "" || channel_name == "" {
 		return fmt.Errorf("Message or channel name should not be empty")
 	}
-	err := irc.send_command("PRIVMSG " + channel_name, ":" + message)
+	err := irc.send_command("PRIVMSG "+channel_name, ":"+message)
 	return err
 }
 
@@ -82,7 +82,7 @@ func main() {
 				log.Fatal("Unable to read data from socket")
 			}
 
-			message := string(received_data)
+			message := strings.Split(string(received_data), "\n")[0]
 
 			if received_data_size > 0 {
 				fmt.Println(message)
