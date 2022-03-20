@@ -10,8 +10,7 @@
 | `!me`        | A little description about me                                                           | :x:                |
 | `!projects`  | List of open source projects that I built                                               | :x:                |
 | `!today`     | What am I doing today?                                                                  | :x:                |
-| `!today`     | What am I doing today?                                                                  | :x:                |
-| `!colors`    | What am I doing today?                                                                  | :x:                |
+| `!colors`    | Name of the color scheme I'm currently using                                            | :x:                |
 
 ## License
 This project is licensed under the [MIT](./LICENSE) license.
