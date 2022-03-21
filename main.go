@@ -13,15 +13,23 @@ import (
 var wg = sync.WaitGroup{}
 
 type IRC struct {
-	client net.Conn
+	channel_name string
+	bot_name     string
+	oauth_token  string
+	client       net.Conn
 }
 
-func new_irc() (*IRC, error) {
+func new_irc(channel_name, bot_name, oauth_token string) (*IRC, error) {
 	connection, err := net.Dial("tcp", "irc.chat.twitch.tv:6667")
 	if err != nil {
 		return nil, err
 	}
-	return &IRC{connection}, nil
+
+	if channel_name == "" || bot_name == "" || oauth_token == "" {
+		return nil, fmt.Errorf("Fields should not be empty")
+	}
+
+	return &IRC{channel_name, bot_name, oauth_token, connection}, nil
 }
 
 func (irc *IRC) send_command(command, body string) error {
@@ -32,11 +40,11 @@ func (irc *IRC) send_command(command, body string) error {
 	return err
 }
 
-func (irc *IRC) send_message(channel_name, message string) error {
-	if message == "" || channel_name == "" {
+func (irc *IRC) send_message(message string) error {
+	if message == "" {
 		return fmt.Errorf("message or channel name should not be empty")
 	}
-	err := irc.send_command("PRIVMSG "+channel_name, ":"+message)
+	err := irc.send_command("PRIVMSG "+irc.channel_name, ":"+message)
 	return err
 }
 
@@ -61,16 +69,16 @@ func main() {
 		CHANNEL_NAME = "#" + os.Getenv("CHANNEL_NAME")
 	)
 
-	irc, err := new_irc()
+	irc, err := new_irc(CHANNEL_NAME, BOT_NAME, OAUTH_TOKEN)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	wg.Add(2)
 	go func() {
-		irc.send_command("PASS", OAUTH_TOKEN)
-		irc.send_command("NICK", BOT_NAME)
-		irc.send_command("JOIN", CHANNEL_NAME)
+		irc.send_command("PASS", irc.oauth_token)
+		irc.send_command("NICK", irc.bot_name)
+		irc.send_command("JOIN", irc.channel_name)
 		wg.Done()
 	}()
 
@@ -92,15 +100,63 @@ func main() {
 					log.Fatal(err)
 				}
 				if strings.HasPrefix(raw_message, "PING") {
-					err := irc.send_pong_to_server()
-					if err != nil {
-						log.Fatal(err)
-					}
+					go func() {
+						err := irc.send_pong_to_server()
+						if err != nil {
+							log.Fatal(err)
+						}
+					}()
+				}
+
+				if strings.HasPrefix(parsed_message, "!commands") {
+					go func() {
+						err := irc.send_message("List of commands: ...")
+						if err != nil {
+							log.Fatal(err)
+						}
+					}()
 				} else if strings.HasPrefix(parsed_message, "!bot") {
-					err := irc.send_message(CHANNEL_NAME, "Testing my bot")
-					if err != nil {
-						log.Fatal(err)
-					}
+					go func() {
+						err := irc.send_message("My bot is open-source and it was written in Go")
+						if err != nil {
+							log.Fatal(err)
+						}
+					}()
+				} else if strings.HasPrefix(parsed_message, "!me") {
+					go func() {
+						err := irc.send_message("I am coding")
+						if err != nil {
+							log.Fatal(err)
+						}
+					}()
+				} else if strings.HasPrefix(parsed_message, "!projects") {
+					go func() {
+						err := irc.send_message("My projects are avaiable on GitHub...")
+						if err != nil {
+							log.Fatal(err)
+						}
+					}()
+				} else if strings.HasPrefix(parsed_message, "!socials") {
+					go func() {
+						err := irc.send_message("Socials here: ")
+						if err != nil {
+							log.Fatal(err)
+						}
+					}()
+				} else if strings.HasPrefix(parsed_message, "!colors") {
+					go func() {
+						err := irc.send_message("My color scheme is called Icarus and you can find here...")
+						if err != nil {
+							log.Fatal(err)
+						}
+					}()
+				} else if strings.HasPrefix(parsed_message, "!today") {
+					go func() {
+						err := irc.send_message("My name is Hícaro")
+						if err != nil {
+							log.Fatal(err)
+						}
+					}()
 				}
 			}
 		}
