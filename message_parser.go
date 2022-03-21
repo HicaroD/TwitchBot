@@ -55,5 +55,5 @@ func (parser *Parser) parse() (string, string, error) {
 
 		return nickname, message, nil
 	}
-	return "S: ", parser.raw_message, nil
+	return "", "", nil
 }
