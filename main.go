@@ -76,6 +76,7 @@ func main() {
 		"projects":         "All my projects are open-source. You can find them on https://github.com/HicaroD",
 		"colors":           "My color scheme is called Icarus.\nVSCode: https://marketplace.visualstudio.com/items?itemName=Hcaro.icarus\n[Neo]Vim: https://github.com/HicaroD/Icarus",
 		"bot":              "This bot is one of my projects and it was written in Go. You can find it here: https://github.com/HicaroD/TwitchBot",
+		"today":            "No tasks today.",
 	}
 
 	irc, err := new_irc(CHANNEL_NAME, BOT_NAME, OAUTH_TOKEN)
@@ -103,7 +104,7 @@ func main() {
 
 			if received_data_size > 0 {
 				parser := new_parser(raw_message)
-				_, parsed_message, err := parser.parse()
+				nickname, parsed_message, err := parser.parse()
 
 				if err != nil {
 					log.Fatal(err)
@@ -157,6 +158,24 @@ func main() {
 						err := irc.send_message(commands["colors"])
 						if err != nil {
 							log.Fatal(err)
+						}
+					}()
+				} else if strings.HasPrefix(parsed_message, "!today") {
+					go func() {
+						if nickname == "hicaro____" {
+							message := strings.TrimPrefix(parsed_message, "!today")
+							if strings.TrimSpace(message) == "" {
+								err := irc.send_message(commands["today"])
+								if err != nil {
+									log.Fatal(err)
+								}
+							}
+							commands["today"] = message
+						} else {
+							err := irc.send_message(commands["today"])
+							if err != nil {
+								log.Fatal(err)
+							}
 						}
 					}()
 				}
