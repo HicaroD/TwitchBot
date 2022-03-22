@@ -71,10 +71,10 @@ func main() {
 
 	commands := map[string]string{
 		"list_of_commands": "!me, !bot, !socials, !projects, !colors",
-		"me":               "My name is Hicaro, I don't stream that much, but welcome!",
+		"me":               "My name is Hícaro, I don't stream that much, but I hope you like it <3",
 		"socials":          "Twitter: https://twitter.com/DanrlleyHicaro",
 		"projects":         "All my projects are open-source. You can find them on https://github.com/HicaroD",
-		"colors":           "My color scheme is called Icarus.\nVSCode: https://marketplace.visualstudio.com/items?itemName=Hcaro.icarus\n[Neo]Vim: https://github.com/HicaroD/Icarus",
+		"colors":           "https://github.com/HicaroD/Icarus",
 		"bot":              "This bot is one of my projects and it was written in Go. You can find it here: https://github.com/HicaroD/TwitchBot",
 		"today":            "No tasks today.",
 	}
@@ -169,8 +169,9 @@ func main() {
 								if err != nil {
 									log.Fatal(err)
 								}
+							} else {
+								commands["today"] = message
 							}
-							commands["today"] = message
 						} else {
 							err := irc.send_message(commands["today"])
 							if err != nil {
