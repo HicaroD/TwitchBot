@@ -69,6 +69,15 @@ func main() {
 		CHANNEL_NAME = "#" + os.Getenv("CHANNEL_NAME")
 	)
 
+	commands := map[string]string{
+		"list_of_commands": "!me, !bot, !socials, !projects, !colors",
+		"me":               "My name is Hicaro, I don't stream that much, but welcome!",
+		"socials":          "Twitter: https://twitter.com/DanrlleyHicaro",
+		"projects":         "All my projects are open-source. You can find them on https://github.com/HicaroD",
+		"colors":           "My color scheme is called Icarus.\nVSCode: https://marketplace.visualstudio.com/items?itemName=Hcaro.icarus\n[Neo]Vim: https://github.com/HicaroD/Icarus",
+		"bot":              "This bot is one of my projects and it was written in Go. You can find it here: https://github.com/HicaroD/TwitchBot",
+	}
+
 	irc, err := new_irc(CHANNEL_NAME, BOT_NAME, OAUTH_TOKEN)
 	if err != nil {
 		log.Fatal(err)
@@ -110,49 +119,42 @@ func main() {
 
 				if strings.HasPrefix(parsed_message, "!commands") {
 					go func() {
-						err := irc.send_message("List of commands: ...")
+						err := irc.send_message(commands["list_of_commands"])
 						if err != nil {
 							log.Fatal(err)
 						}
 					}()
 				} else if strings.HasPrefix(parsed_message, "!bot") {
 					go func() {
-						err := irc.send_message("My bot is open-source and it was written in Go")
+						err := irc.send_message(commands["bot"])
 						if err != nil {
 							log.Fatal(err)
 						}
 					}()
 				} else if strings.HasPrefix(parsed_message, "!me") {
 					go func() {
-						err := irc.send_message("I am coding")
+						err := irc.send_message(commands["me"])
 						if err != nil {
 							log.Fatal(err)
 						}
 					}()
 				} else if strings.HasPrefix(parsed_message, "!projects") {
 					go func() {
-						err := irc.send_message("My projects are avaiable on GitHub...")
+						err := irc.send_message(commands["projects"])
 						if err != nil {
 							log.Fatal(err)
 						}
 					}()
 				} else if strings.HasPrefix(parsed_message, "!socials") {
 					go func() {
-						err := irc.send_message("Socials here: ")
+						err := irc.send_message(commands["socials"])
 						if err != nil {
 							log.Fatal(err)
 						}
 					}()
 				} else if strings.HasPrefix(parsed_message, "!colors") {
 					go func() {
-						err := irc.send_message("My color scheme is called Icarus and you can find here...")
-						if err != nil {
-							log.Fatal(err)
-						}
-					}()
-				} else if strings.HasPrefix(parsed_message, "!today") {
-					go func() {
-						err := irc.send_message("My name is Hícaro")
+						err := irc.send_message(commands["colors"])
 						if err != nil {
 							log.Fatal(err)
 						}
