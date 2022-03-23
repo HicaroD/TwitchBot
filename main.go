@@ -162,7 +162,7 @@ func main() {
 					}()
 				} else if strings.HasPrefix(parsed_message, "!today") {
 					go func() {
-						if nickname == irc.channel_name {
+						if nickname == "hicaro____" {
 							message_body := parser.get_command_message_body(parsed_message, "!today")
 
 							if message_body == "" {
