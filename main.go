@@ -162,15 +162,16 @@ func main() {
 					}()
 				} else if strings.HasPrefix(parsed_message, "!today") {
 					go func() {
-						if nickname == "hicaro____" {
-							message := strings.TrimPrefix(parsed_message, "!today")
-							if strings.TrimSpace(message) == "" {
+						if nickname == irc.channel_name {
+							message_body := parser.get_command_message_body(parsed_message, "!today")
+
+							if message_body == "" {
 								err := irc.send_message(commands["today"])
 								if err != nil {
 									log.Fatal(err)
 								}
 							} else {
-								commands["today"] = message
+								commands["today"] = message_body
 							}
 						} else {
 							err := irc.send_message(commands["today"])
