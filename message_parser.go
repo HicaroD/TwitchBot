@@ -57,3 +57,8 @@ func (parser *Parser) parse() (string, string, error) {
 	}
 	return "", "", nil
 }
+
+func (parser *Parser) get_command_message_body(message, command string) string {
+	message_body := strings.TrimPrefix(message, command)
+	return strings.TrimSpace(message_body)
+}
