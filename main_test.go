@@ -1,16 +1,16 @@
 package main
 
 import (
-    "testing"
-    "github.com/joho/godotenv"
-    "os"
+	"github.com/joho/godotenv"
+	"os"
+	"testing"
 )
 
 func Test_if_gets_error_when_command_is_empty(t *testing.T) {
-    err := godotenv.Load()
-    if err != nil {
+	err := godotenv.Load()
+	if err != nil {
 		t.Fatalf("Unable to read .env file")
-    }   
+	}
 
 	var (
 		OAUTH_TOKEN  = os.Getenv("OAUTH_TOKEN")
@@ -19,9 +19,9 @@ func Test_if_gets_error_when_command_is_empty(t *testing.T) {
 	)
 
 	irc, err := new_irc(CHANNEL_NAME, BOT_NAME, OAUTH_TOKEN)
-    if err != nil {
+	if err != nil {
 		t.Fatalf("Unable to create IRC client")
-    }
+	}
 
 	inputs := [][]string{{"", "some data"}, {"some data", ""}, {"", ""}}
 
@@ -34,12 +34,12 @@ func Test_if_gets_error_when_command_is_empty(t *testing.T) {
 }
 
 func Test_if_gets_error_when_message_is_empty(t *testing.T) {
-    var err error
+	var err error
 
-    err = godotenv.Load()
-    if err != nil {
+	err = godotenv.Load()
+	if err != nil {
 		t.Fatalf("Unable to read .env file")
-    }   
+	}
 
 	var (
 		OAUTH_TOKEN  = os.Getenv("OAUTH_TOKEN")
@@ -48,12 +48,12 @@ func Test_if_gets_error_when_message_is_empty(t *testing.T) {
 	)
 
 	irc, err := new_irc(CHANNEL_NAME, BOT_NAME, OAUTH_TOKEN)
-    if err != nil {
+	if err != nil {
 		t.Fatalf("Unable to create IRC client")
-    }
+	}
 
-    err = irc.send_message("")
-    if err == nil {
-        t.Fatalf("Message shouldn't be empty!")
-    }
+	err = irc.send_message("")
+	if err == nil {
+		t.Fatalf("Message shouldn't be empty!")
+	}
 }
