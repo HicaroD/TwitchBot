@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 	"log"
 	"net"
 	"os"
