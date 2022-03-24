@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	// "github.com/joho/godotenv"
 	"log"
 	"net"
 	"os"
@@ -57,11 +56,6 @@ const BUFFER_SIZE = 2040
 
 func main() {
 	var err error
-
-	//err = godotenv.Load()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
 
 	var (
 		OAUTH_TOKEN  = os.Getenv("OAUTH_TOKEN")
