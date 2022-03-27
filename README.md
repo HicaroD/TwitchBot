@@ -1,6 +1,8 @@
 # TwitchBot
-🤖 A chat bot for my [Twitch channel](https://www.twitch.tv/hicaro____) written in Go.
 ![image](images/1.png)
+
+🤖 A chat bot for my [Twitch channel](https://www.twitch.tv/hicaro____) written in Go.
+
 
 **This bot is still not deployed**
 
