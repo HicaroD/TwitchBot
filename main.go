@@ -68,7 +68,6 @@ func main() {
 		"me":               "My name is Hícaro, I don't stream that much, but I hope you like it <3",
 		"socials":          "Twitter: https://twitter.com/DanrlleyHicaro",
 		"projects":         "All my projects are open-source. You can find them on https://github.com/HicaroD",
-		"colors":           "https://github.com/HicaroD/Icarus",
 		"bot":              "This bot is one of my projects and it was written in Go. You can find it here: https://github.com/HicaroD/TwitchBot",
 		"today":            "No tasks today.",
 	}
@@ -143,13 +142,6 @@ func main() {
 				} else if strings.HasPrefix(parsed_message, "!socials") {
 					go func() {
 						err := irc.send_message(commands["socials"])
-						if err != nil {
-							log.Fatal(err)
-						}
-					}()
-				} else if strings.HasPrefix(parsed_message, "!colors") {
-					go func() {
-						err := irc.send_message(commands["colors"])
 						if err != nil {
 							log.Fatal(err)
 						}
