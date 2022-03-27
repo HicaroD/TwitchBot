@@ -2,6 +2,8 @@
 🤖 A chat bot for my [Twitch channel](https://www.twitch.tv/hicaro____) written in Go.
 ![image](images/1.png)
 
+**This bot is still not deployed**
+
 ## Commands
 | Command      | Description                                                                             | Is it implemented? |
 |--------------|-----------------------------------------------------------------------------------------|--------------------|
