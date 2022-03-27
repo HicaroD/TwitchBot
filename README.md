@@ -3,7 +3,6 @@
 
 🤖 A chat bot for my [Twitch channel](https://www.twitch.tv/hicaro____) written in Go.
 
-
 **This bot is still not deployed**
 
 ## Commands
