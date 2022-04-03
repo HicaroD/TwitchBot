@@ -69,7 +69,7 @@ func main() {
 	fmt.Println(OAUTH_TOKEN, BOT_NAME, CHANNEL_NAME)
 
 	commands := map[string]string{
-		"list_of_commands": "!me, !bot, !socials, !projects, !colors",
+		"list_of_commands": "!me, !bot, !socials, !projects, !today",
 		"me":               "My name is Hícaro, I don't stream that much, but I hope you like it <3",
 		"socials":          "Twitter: https://twitter.com/DanrlleyHicaro",
 		"projects":         "All my projects are open-source. You can find them on https://github.com/HicaroD",
