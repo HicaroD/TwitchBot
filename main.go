@@ -11,8 +11,10 @@ import (
 	"sync"
 )
 
-var twitch_irc_client = "irc.chat.twitch.tv:6667"
-var wg = sync.WaitGroup{}
+var (
+    twitch_irc_client = "irc.chat.twitch.tv:6667"
+    wg = sync.WaitGroup{}
+)
 
 type IRC struct {
 	channel_name string
