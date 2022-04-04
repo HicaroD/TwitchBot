@@ -11,6 +11,7 @@ import (
 	"sync"
 )
 
+var twitch_irc_client = "irc.chat.twitch.tv:6667"
 var wg = sync.WaitGroup{}
 
 type IRC struct {
@@ -21,7 +22,7 @@ type IRC struct {
 }
 
 func new_irc(channel_name, bot_name, oauth_token string) (*IRC, error) {
-	connection, err := net.Dial("tcp", "irc.chat.twitch.tv:6667")
+	connection, err := net.Dial("tcp", twitch_irc_client)
 	if err != nil {
 		return nil, err
 	}
