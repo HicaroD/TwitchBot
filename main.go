@@ -12,8 +12,8 @@ import (
 )
 
 var (
-    twitch_irc_client = "irc.chat.twitch.tv:6667"
-    wg = sync.WaitGroup{}
+	twitch_irc_client = "irc.chat.twitch.tv:6667"
+	wg                = sync.WaitGroup{}
 )
 
 type IRC struct {
@@ -69,7 +69,7 @@ func main() {
 		CHANNEL_NAME = "#" + os.Getenv("CHANNEL_NAME")
 		PORT         = os.Getenv("PORT")
 	)
-	fmt.Println(OAUTH_TOKEN, BOT_NAME, CHANNEL_NAME)
+	fmt.Println("Joining chat!")
 
 	commands := map[string]string{
 		"list_of_commands": "!me, !bot, !socials, !projects, !today",
@@ -177,7 +177,6 @@ func main() {
 				}
 			}
 		}
-		wg.Done()
 	}()
 	log.Fatal(http.ListenAndServe(":"+PORT, nil))
 	wg.Wait()
