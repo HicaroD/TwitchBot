@@ -5,7 +5,6 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"net"
-	"net/http"
 	"os"
 	"strings"
 	"sync"
@@ -67,7 +66,6 @@ func main() {
 		OAUTH_TOKEN  = os.Getenv("OAUTH_TOKEN")
 		BOT_NAME     = os.Getenv("BOT_NAME")
 		CHANNEL_NAME = "#" + os.Getenv("CHANNEL_NAME")
-		PORT         = os.Getenv("PORT")
 	)
 	fmt.Println("Joining chat!")
 
@@ -178,6 +176,5 @@ func main() {
 			}
 		}
 	}()
-	log.Fatal(http.ListenAndServe(":"+PORT, nil))
 	wg.Wait()
 }
