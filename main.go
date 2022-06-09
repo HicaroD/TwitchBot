@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -20,6 +22,33 @@ type IRC struct {
 	bot_name     string
 	oauth_token  string
 	client       net.Conn
+}
+
+type Commands struct {
+	Commands string `json:"commands"`
+	Me       string `json:"me"`
+	Socials  string `json:"socials"`
+	Projects string `json:"projects"`
+	Bot      string `json:"bot"`
+	Today    string `json:"today"`
+}
+
+func get_commands() (*Commands, error) {
+	var err error
+
+	content, err := ioutil.ReadFile("./commands.json")
+	if err != nil {
+		return nil, err
+	}
+
+	var commands Commands
+	err = json.Unmarshal(content, &commands)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &commands, nil
 }
 
 func new_irc(channel_name, bot_name, oauth_token string) (*IRC, error) {
@@ -69,16 +98,13 @@ func main() {
 	)
 	fmt.Println("Joining chat!")
 
-	commands := map[string]string{
-		"list_of_commands": "!me, !bot, !socials, !projects, !today",
-		"me":               "My name is Hícaro, I don't stream that much, but I hope you like it <3",
-		"socials":          "Twitter: https://twitter.com/DanrlleyHicaro",
-		"projects":         "All my projects are open-source. You can find them on https://github.com/HicaroD",
-		"bot":              "This bot is one of my projects and it was written in Go. You can find it here: https://github.com/HicaroD/TwitchBot",
-		"today":            "No tasks today.",
+	irc, err := new_irc(CHANNEL_NAME, BOT_NAME, OAUTH_TOKEN)
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	irc, err := new_irc(CHANNEL_NAME, BOT_NAME, OAUTH_TOKEN)
+	commands, err := get_commands()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -119,35 +145,35 @@ func main() {
 
 				if strings.HasPrefix(parsed_message, "!commands") {
 					go func() {
-						err := irc.send_message(commands["list_of_commands"])
+						err := irc.send_message(commands.Commands)
 						if err != nil {
 							log.Fatal(err)
 						}
 					}()
 				} else if strings.HasPrefix(parsed_message, "!bot") {
 					go func() {
-						err := irc.send_message(commands["bot"])
+						err := irc.send_message(commands.Bot)
 						if err != nil {
 							log.Fatal(err)
 						}
 					}()
 				} else if strings.HasPrefix(parsed_message, "!me") {
 					go func() {
-						err := irc.send_message(commands["me"])
+						err := irc.send_message(commands.Me)
 						if err != nil {
 							log.Fatal(err)
 						}
 					}()
 				} else if strings.HasPrefix(parsed_message, "!projects") {
 					go func() {
-						err := irc.send_message(commands["projects"])
+						err := irc.send_message(commands.Projects)
 						if err != nil {
 							log.Fatal(err)
 						}
 					}()
 				} else if strings.HasPrefix(parsed_message, "!socials") {
 					go func() {
-						err := irc.send_message(commands["socials"])
+						err := irc.send_message(commands.Socials)
 						if err != nil {
 							log.Fatal(err)
 						}
@@ -158,15 +184,15 @@ func main() {
 							message_body := parser.get_command_message_body(parsed_message, "!today")
 
 							if message_body == "" {
-								err := irc.send_message(commands["today"])
+								err := irc.send_message(commands.Today)
 								if err != nil {
 									log.Fatal(err)
 								}
 							} else {
-								commands["today"] = message_body
+								commands.Today = message_body
 							}
 						} else {
-							err := irc.send_message(commands["today"])
+							err := irc.send_message(commands.Today)
 							if err != nil {
 								log.Fatal(err)
 							}
